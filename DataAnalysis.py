@@ -2,10 +2,6 @@ import pandas as pd
 import statsmodels.api as sm
 from statsmodels.tsa.seasonal import seasonal_decompose
 
-import pandas as pd
-import statsmodels.api as sm
-from statsmodels.tsa.seasonal import seasonal_decompose
-
 def analyze_seasonality_acf(input_file, output_file):
     """
     Analyze seasonality and autocorrelation for the given trends data.
@@ -57,6 +53,7 @@ def analyze_seasonality_acf(input_file, output_file):
     results_df.to_csv(output_file, index=False)
     print(f"Results have been saved to '{output_file}'.")
 
+
 def combine_data(pre_file, post_file, output_file):
     """
     Combine pre-pandemic and post-pandemic data into one CSV file.
@@ -76,3 +73,61 @@ def combine_data(pre_file, post_file, output_file):
     combined_data.to_csv(output_file, index=False)
 
     print(f"Data successfully combined and saved to '{output_file}'.")
+
+
+def load_and_prepare_data(file_path):
+
+    df = pd.read_excel(file_path)
+
+    # converting month column
+    df['Month'] = pd.to_datetime(df['Month'])
+
+    df['Month_Name'] = df['Month'].dt.month_name()
+
+    df = df.drop(columns=['Month'])
+
+    # need to rearrange col so Month_Name comes first
+    cols = ['Month_Name'] + [col for col in df if col != 'Month_Name']
+    df = df[cols]
+
+    return df
+
+
+def calculate_monthly_means(df):
+
+    monthly_means = df.groupby('Month_Name').mean()
+
+    # sort
+    month_order = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ]
+    monthly_means = monthly_means.reindex(month_order)
+
+    return monthly_means
+
+
+def prepare_dataset_for_svm(monthly_means, labels=None):
+
+    # transpose to make each query a row
+    dataset = monthly_means.T
+    dataset.columns = [
+        "Jan_mean", "Feb_mean", "Mar_mean", "Apr_mean", "May_mean", "Jun_mean",
+        "Jul_mean", "Aug_mean", "Sep_mean", "Oct_mean", "Nov_mean", "Dec_mean"
+    ]
+
+    dataset.reset_index(inplace=True)
+    dataset.rename(columns={'index': 'Query'}, inplace=True)
+
+    # label column for classifier
+    if labels is not None:
+        dataset['Label'] = labels
+    else:
+        dataset['Label'] = None  # leaving blank for manual labeling
+
+    return dataset
+
+
+def save_dataset_to_csv(dataset, output_path):
+    dataset.to_csv(output_path, index=False)
+    print(f"Dataset saved to {output_path}")
