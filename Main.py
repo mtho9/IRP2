@@ -1,10 +1,9 @@
-from DataRetrieval import fetch_trends_data
+import DataRetrieval
 import DataAnalysis
-import Classification
 
 def main():
-    file_path = "all_trends_data.xlsx"  # Replace with your Excel file path
-    output_path = "prepared_SVM_dataset.csv"  # Desired output CSV file path
+    file_path = "all_trends_data_nonseasonal.xlsx"
+    output_path = "prepared_SVM_dataset_nonseass.csv"
 
     df = DataAnalysis.load_and_prepare_data(file_path)
 
@@ -15,4 +14,6 @@ def main():
     DataAnalysis.save_dataset_to_csv(dataset, output_path)
 
 if __name__ == "__main__":
-    main()
+    # main()
+    # DataRetrieval.fetch_trends_data("queries_non_seasonal.csv", "2004-01-01", "2024-01-01", "trends_non_seasonal.csv")
+    DataAnalysis.calculate_summer_winter_ratio("prepared_SVM_dataset.csv", "sum_win_ratio.csv")
