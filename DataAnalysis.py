@@ -131,3 +131,20 @@ def prepare_dataset_for_svm(monthly_means, labels=None):
 def save_dataset_to_csv(dataset, output_path):
     dataset.to_csv(output_path, index=False)
     print(f"Dataset saved to {output_path}")
+
+
+def calculate_summer_winter_ratio(input_file, output_file):
+
+    data = pd.read_csv(input_file)
+
+    # sum-win ratio calc
+    data['Summer_Winter_Ratio'] = (
+            data[['Jun_mean', 'Jul_mean', 'Aug_mean']].mean(axis=1) /
+            data[['Dec_mean', 'Jan_mean', 'Feb_mean']].mean(axis=1)
+    )
+
+    output_data = data[['Query', 'Summer_Winter_Ratio']]
+
+    output_data.to_csv(output_file, index=False)
+
+    print(f"Summer-Winter ratio saved to {output_file}")
