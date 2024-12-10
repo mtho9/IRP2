@@ -17,7 +17,7 @@ def fetch_trends_data(query_file, start_date, end_date, output_file):
         print(f"Fetching data for: {query}")
         pytrends.build_payload([query], timeframe=f'{start_date} {end_date}', geo='')
 
-        time.sleep(30)  # adjust based on what works, usually 5-10 secs work
+        time.sleep(3)  # adjust based on what works, usually 5-10 secs work
 
         try:
             data = pytrends.interest_over_time()
